@@ -1,188 +1,188 @@
-# Etudes
+# Etudes — Sprint Coach Plugin
 
-A sprint coach for builders who have more ideas than shipped products.
+A sprint coach for builders who have more ideas than shipped products. Etudes interviews you about your project, skills, and patterns, then generates a 5-day sprint calibrated to how you actually work.
 
-Etudes interviews you about your project, skills, and patterns, then generates a 5-day sprint calibrated to how you actually work. It coaches you through the sprint with daily check-ins, pattern detection, and real-time accountability.
+## Overview
 
-## What It Does
+Etudes provides a structured coaching workflow inside Claude Code. It reads your codebase, conducts a conversational intake interview, detects avoidance patterns, and generates a concrete 5-day sprint with time-estimated tasks grounded in your actual files. During the sprint, it provides daily check-ins, catches avoidance in real-time, and captures new ideas in a parking lot so they don't derail focus.
 
-1. **Intake interview** — Asks about your project, work patterns, and available time. If you have code, it reads the repo. If you have a spec, it assesses scope. If you have nothing, it helps you pick a starting point.
-2. **Pattern detection** — Identifies your specific avoidance patterns (overplanning, idea-hopping, scope creep, confidence gaps) and calibrates coaching style accordingly.
-3. **Sprint generation** — Creates a 5-day sprint with concrete, time-estimated, checkbox tasks grounded in your actual codebase.
-4. **Active coaching** — Daily check-ins that catch avoidance in real-time, capture new ideas without letting them derail you, and keep you focused on the next checkbox.
-5. **Sprint retro** — Reviews what shipped, what was avoided, and what to change next time.
+All state persists in a `.etudes/` directory at your project root, so coaching continues across sessions.
 
-## What It Is Not
+## Contents
 
-- **Not a project manager.** It doesn't track Jira tickets or integrate with your PM tools. It tracks one thing: did you ship.
-- **Not a therapist.** It mirrors your patterns back to you. It doesn't diagnose or treat anything.
-- **Not motivational.** No "you've got this!" or "amazing work!" If you respond better to encouragement, you can set that in intake. But the default is direct.
-- **Not an AI coding assistant.** It doesn't write your code. It tells you what to build next, in what order, and calls you out when you're avoiding it.
-- **Not a long-term planning tool.** It generates 5-day sprints. Not roadmaps, not quarterly plans, not OKRs. Five days. Checkboxes. Ship.
+| Type | Name | Description |
+|------|------|-------------|
+| **Skill** | `etudes` | Core coaching engine — intake interview, pattern detection, sprint generation, active coaching |
+| **Command** | `/etudes` | Main entry point — runs intake if new, shows sprint status if returning |
+| **Command** | `/etudes-checkin` | Daily check-in — reads sprint, asks what's done, updates progress |
+| **Command** | `/etudes-retro` | Sprint retrospective — reviews what shipped, parking lot, generates next sprint |
+| **Command** | `/etudes-park` | Parking lot capture — saves an idea mid-sprint without context-switching |
 
-## Installation
+## Commands
 
-### Via skills.sh (Recommended)
+### `/etudes`
 
+Launches the full workflow. On first run, conducts the intake interview and generates a sprint. On subsequent runs, reads `.etudes/` state and shows current sprint status.
+
+**Usage:**
 ```bash
-npx skills add keecraw/etudes
-```
-
-That's it. Works with Claude Code, Cursor, Windsurf, Cline, Codex, and 15+ other agents.
-
-### Via GitHub (manual)
-
-```bash
-git clone https://github.com/keecraw/etudes.git /tmp/etudes && \
-  mkdir -p .claude/skills/etudes .claude/commands && \
-  cp /tmp/etudes/skills/etudes/SKILL.md .claude/skills/etudes/ && \
-  cp /tmp/etudes/commands/*.md .claude/commands/ && \
-  rm -rf /tmp/etudes
-```
-
-### Manual Setup (any Claude Code project)
-
-If you don't want the full plugin, you can install just the pieces you need:
-
-```bash
-# Install the skill only
-mkdir -p .claude/skills/etudes
-cp skills/etudes/SKILL.md .claude/skills/etudes/SKILL.md
-
-# Install the slash commands
-cp commands/*.md .claude/commands/
-```
-
-### As a Claude Project (web UI)
-
-If you want to use Etudes without Claude Code:
-
-1. Create a new Claude Project at [claude.ai](https://claude.ai)
-2. Paste the contents of `system-prompt.md` as the project's system prompt
-3. Start a conversation
-
-## Usage
-
-### Start a new sprint
-
-```
 /etudes
 ```
 
-Runs the full intake if this is your first time, or shows your sprint status if you already have one.
-
-### Daily check-in
-
+Or with context:
+```bash
+/etudes I'm building a recipe app and I keep rewriting the data model instead of shipping
 ```
+
+### `/etudes-checkin`
+
+Daily check-in during an active sprint. Reads the current sprint file, determines what day you're on, and asks for a status update. Marks completed tasks and redirects if it detects avoidance patterns.
+
+**Usage:**
+```bash
 /etudes-checkin
 ```
 
 Or with an update:
-
+```bash
+/etudes-checkin finished tasks 1 and 2, stuck on the auth flow
 ```
-/etudes-checkin finished the header component, stuck on the auth flow
-```
 
-### Park an idea mid-sprint
+### `/etudes-park`
 
-```
+Captures a new idea mid-sprint without derailing focus. Appends to `.etudes/parking-lot.md` and immediately redirects back to the current task.
+
+**Usage:**
+```bash
 /etudes-park what if I added a dark mode toggle
 ```
 
-Captures the idea in `.etudes/parking-lot.md` without derailing your sprint.
+### `/etudes-retro`
 
-### Sprint retrospective
+End-of-sprint retrospective. Cross-references completed tasks with git commits, reviews the parking lot, identifies patterns, and optionally generates the next sprint with adjustments.
 
-```
+**Usage:**
+```bash
 /etudes-retro
 ```
 
-Reviews what shipped, what was avoided, and generates the next sprint if you want one.
+## The Workflow
 
-## How It Works
+### Phase 1: Intake Interview
 
-### Intake (first run)
+Etudes asks ~8 questions, one at a time, conversationally. It simultaneously scans the repo for signals: git log activity, README, tech stack, test coverage, deployment configs.
 
-Etudes asks ~8 questions, one at a time, conversationally. It also scans your repo for signals: git activity, README, tech stack, test coverage, deployment configs.
+**Entry path detection:**
+- **Existing code**: Assesses project state, asks where you get blocked
+- **Spec or PRD**: Probes for the MVP buried in the spec
+- **Idea only**: Asks what's stopped it from happening
+- **Multiple projects**: Runs a lightweight dialectic to pick the shortest path to something shipped
 
-If you're torn between projects, it walks you through a lightweight dialectic to help you pick the one with the shortest path to something shipped.
+**Builder profile questions:**
+- What does "done" look like in 7 days?
+- Technical background
+- Work patterns (multi-select avoidance pattern detector)
+- Shipping history
+- Available time per day
+- Preferred coaching tone
 
-### Coaching Modes
+### Phase 2: Pattern Detection
 
-Based on intake, Etudes selects a coaching mode. It never announces the mode — it just shifts behavior:
+Based on intake signals, Etudes selects a coaching mode internally. It never announces the mode — it just shifts behavior.
 
-| Mode | When | Behavior |
-|------|------|----------|
-| **Architect to Executor** | Elaborate plans, nothing shipped | Cut scope. "Your spec is for a funded team. You're one person." |
-| **Confidence Builder** | Has skills but doesn't trust them | Validate with evidence. "You've shipped before. Same muscle." |
-| **Focus Lock** | Keeps starting new projects | Name the pattern. Redirect. "That's a different project." |
-| **Unblocking** | Stuck on a specific task | Break into 10-min chunks. Remove decisions. |
-| **Accountability** | Goes quiet, reports no progress | Pick up where they left off. No shame. |
+| Mode | Triggers | Behavior |
+|------|----------|----------|
+| **Architect to Executor** | Elaborate plans, nothing shipped, overscoped goals | Cut scope aggressively. Trivially small first tasks. No spec editing rule. |
+| **Confidence Builder** | Self-taught, minimizing language, discounts shipped work | Validate with evidence from their code. Progressive difficulty. |
+| **Focus Lock** | Multiple projects, new ideas mid-conversation | Name the pattern. Redirect every time. Parking lot everything. |
+| **Unblocking** | Stuck on specific task, emotional language about blocker | Break into 10-minute chunks. Remove decisions. Reference specific files. |
+| **Accountability** | Git log gaps, vague about activity, shame language | Pick up where they left off. No shame. No lectures. |
 
-### Sprint Structure
+Modes shift mid-sprint based on observed behavior.
 
-5-day sprints. Each day has:
-- 2-6 tasks (calibrated to your available time)
-- Time estimates on every task
-- "Done looks like" definitions
-- End-of-day reflection prompts
+### Phase 3: Sprint Generation
 
-Day 1 is always the easiest (build momentum). Day 5 is always "Ship Day" — put something in front of a real person.
+Generates a 5-day sprint with tasks grounded in the actual codebase.
 
-### State Persistence
+**Sprint structure:**
+- Day 1 is always the easiest (build momentum)
+- Each task has a time estimate and "done =" definition
+- Tasks reference actual files when a repo exists
+- Day 5 is always "Ship Day" — put something visible in front of a real person
 
-All state lives in `.etudes/` at your project root:
+**Task calibration:**
+
+| Signal | Rule |
+|--------|------|
+| 30 min/day | 2 tasks, ≤15 min each |
+| 1 hour/day | 3 tasks |
+| 2-3 hours/day | 4-5 tasks |
+| "I get overwhelmed" | First task < 10 min, daily warm-up |
+| "I pivot to re-planning" | Sprint rule: no spec editing |
+| "I get pulled to new ideas" | Sprint rule: use `/etudes-park` |
+| Time varies wildly | Starred must-do task + optional full-day |
+
+Sprint 1 is always labeled "Calibration Sprint" — the first sprint is about learning how you work.
+
+### Phase 4: Active Coaching
+
+When the user returns for check-ins, Etudes responds based on context:
+
+| Situation | Response |
+|-----------|----------|
+| Completed tasks | Mark done. "What's next?" |
+| Partial completion | "Which ones? What's blocking the rest?" |
+| Gap (missed days) | "What's left on Day [X]?" No shame. |
+| New idea mid-sprint | Park it. Redirect to current task. |
+| Re-planning detected | "This is the pattern. Next checkbox?" |
+| Frustration/anxiety | Zoom to smallest task. "10 minutes. Go." |
+| Wants to quit | "What specifically isn't working? Fix the sprint, not abandon it." |
+
+### Phase 5: Sprint Retro
+
+Reviews completed vs incomplete tasks, cross-references git commits, walks through the parking lot, and generates the next sprint with adjustments if requested.
+
+## State Persistence
+
+All state lives in `.etudes/` at the project root:
 
 ```
 .etudes/
-├── profile.md           # Your builder profile
+├── profile.md           # Builder profile (coaching mode, tone, rules)
 ├── sprint-current.md    # Active sprint with checkboxes
 ├── parking-lot.md       # Ideas captured mid-sprint
 └── retros/
-    └── sprint-1.md      # Past sprint retrospectives
+    └── sprint-1.md      # Sprint retrospectives
 ```
 
-This persists across Claude Code sessions. When you run `/etudes-checkin` tomorrow, it reads your sprint file and picks up where you left off.
+This persists across Claude Code sessions. The commands read state on every invocation.
 
-## Plugin Structure
+## When to Use This Plugin
 
-```
-etudes/
-├── .claude-plugin/
-│   └── plugin.json           # Plugin metadata
-├── commands/
-│   ├── etudes.md             # /etudes — main entry
-│   ├── etudes-checkin.md     # /etudes-checkin — daily check-in
-│   ├── etudes-retro.md       # /etudes-retro — sprint retrospective
-│   └── etudes-park.md        # /etudes-park — parking lot capture
-├── skills/
-│   └── etudes/
-│       └── SKILL.md          # Core skill instructions (the brain)
-├── system-prompt.md          # Claude Project version (standalone)
-├── docs/
-│   └── plans/
-│       └── 2026-03-15-etudes-v1-design.md
-└── README.md
-```
+**Use for:**
+- Side projects that have stalled
+- Projects where you keep planning instead of building
+- When you're torn between multiple projects
+- When you need external accountability to ship
+- When you know what to build but lose momentum in execution
 
-## Distribution
-
-- **skills.sh** — Automatically listed at [skills.sh/keecraw/etudes/etudes](https://skills.sh/keecraw/etudes/etudes)
-- **GitHub** — Clone and install manually from this repo
-- **Claude Code official plugins** — PR submitted to [anthropics/claude-code/plugins](https://github.com/anthropics/claude-code/tree/main/plugins)
+**Don't use for:**
+- Active team projects with existing sprint processes
+- Quick bug fixes or one-off tasks
+- Projects with external deadlines and accountability already in place
 
 ## Design Principles
-
-These shaped every decision in Etudes:
 
 - **One question at a time.** Never dump a list. Never overwhelm.
 - **Mirror, don't diagnose.** Show people their patterns. Don't label them.
 - **Scope only shrinks.** Mid-sprint, nothing gets added. New ideas go to the parking lot.
 - **Ship something visible.** Every sprint ends with something a real person can see.
-- **Sprint 1 is calibration.** Don't judge the first sprint. It's learning how you work.
-- **Name avoidance without judgment.** "This is the pattern" is observation, not accusation.
 - **Direct, not motivational.** Be specific to the person's situation. Never generic.
 
-## License
+## Author
 
-MIT
+keeeeeeeks
+
+## Version
+
+1.0.0
