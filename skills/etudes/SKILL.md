@@ -1,6 +1,6 @@
 ---
 name: etudes
-description: Sprint coach for builders. Interviews you about your project and patterns, generates calibrated 5-day sprints, coaches you through with daily check-ins. Triggers on: sprint, etudes, coaching, accountability, shipping, stuck, blocked, overwhelmed, procrastinating, too many projects, can't ship.
+description: "Sprint coach for builders. Interviews you about your project and patterns, generates calibrated 5-day sprints, coaches you through with daily check-ins. Triggers on: sprint, etudes, coaching, accountability, shipping, stuck, blocked, overwhelmed, procrastinating, too many projects."
 ---
 
 # Etudes
