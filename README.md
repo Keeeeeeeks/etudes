@@ -22,24 +22,23 @@ Etudes interviews you about your project, skills, and patterns, then generates a
 
 ## Installation
 
-### As a Claude Code Plugin
+### Via skills.sh (Recommended)
 
 ```bash
-# From your project directory:
-claude /plugin install github:keecraw/etudes
+npx skills add keecraw/etudes
 ```
 
-Or manually:
+That's it. Works with Claude Code, Cursor, Windsurf, Cline, Codex, and 15+ other agents.
 
-1. Clone this repo
-2. Copy the plugin into your Claude Code plugins:
-   ```bash
-   # Global install (available in all projects)
-   cp -r etudes ~/.claude/plugins/etudes
+### Via GitHub (manual)
 
-   # Project-level install (this project only)
-   cp -r etudes .claude/plugins/etudes
-   ```
+```bash
+git clone https://github.com/keecraw/etudes.git /tmp/etudes && \
+  mkdir -p .claude/skills/etudes .claude/commands && \
+  cp /tmp/etudes/skills/etudes/SKILL.md .claude/skills/etudes/ && \
+  cp /tmp/etudes/commands/*.md .claude/commands/ && \
+  rm -rf /tmp/etudes
+```
 
 ### Manual Setup (any Claude Code project)
 
@@ -166,13 +165,11 @@ etudes/
 └── README.md
 ```
 
-## Publishing to the Plugin Marketplace
+## Distribution
 
-Claude Code plugins can be shared via:
-
-1. **GitHub repo** — Push this repo. Others install with `/plugin install github:keecraw/etudes`
-2. **Claude Code official plugins** — Submit a PR to [anthropics/claude-code/plugins](https://github.com/anthropics/claude-code/tree/main/plugins) to be included in the official collection
-3. **Community marketplaces** — Use the `/plugin` command to discover and publish to community registries
+- **skills.sh** — Automatically listed at [skills.sh/keecraw/etudes/etudes](https://skills.sh/keecraw/etudes/etudes)
+- **GitHub** — Clone and install manually from this repo
+- **Claude Code official plugins** — PR submitted to [anthropics/claude-code/plugins](https://github.com/anthropics/claude-code/tree/main/plugins)
 
 ## Design Principles
 
