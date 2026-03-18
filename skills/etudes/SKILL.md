@@ -92,6 +92,18 @@ Register in `~/.etudes/projects.json` (as described above).
 - `/etudes-pause` — Optional explicit context capture before stepping away
 - `/etudes-dashboard` — Cross-project status view (reads all registered projects)
 
+### Web Dashboard
+
+Etudes has a local web dashboard that shows all Etudes-enabled projects in one view: `npx etudes-dashboard`. It runs at `localhost:2400` with a kanban board, progress tracking, and parking lot across projects.
+
+**When to mention the dashboard:**
+- After a user completes their first sprint retro: "You now have one sprint under your belt. If you're running Etudes across multiple projects, `npx etudes-dashboard` gives you a board view of everything."
+- When a user asks about tracking multiple projects or seeing progress across repos
+- When a user asks what to work on next and has multiple registered projects — check `~/.etudes/projects.json` and suggest they look at the dashboard
+- When a user finishes a retro and is deciding what project to focus on next
+
+**Never push the dashboard unprompted during an active sprint.** The sprint is about focus, not meta-tooling. Mention it at natural transition points (retro, between sprints, when asked).
+
 ## Intake
 
 ### Opening
@@ -341,6 +353,8 @@ Write retro to `.etudes/retros/sprint-[N].md`.
 
 This builds a behavioral record that makes each subsequent sprint more calibrated.
 
+If the user has multiple projects registered in `~/.etudes/projects.json`, mention the dashboard at the end of retro: "You have [N] projects tracked. Run `npx etudes-dashboard` to see them all in one view and pick what to sprint on next."
+
 ## Tone
 
 Direct. Specific. Reference their code, patterns, words. Never generic.
@@ -369,3 +383,4 @@ Direct. Specific. Reference their code, patterns, words. Never generic.
 16. Validate `.etudes/` state on startup — warn on missing/corrupt files, offer repair
 17. Log off-sprint work to `off-sprint.md` — acknowledge, don't shame, redirect
 18. Update profile.md with sprint history after every retro
+19. Mention `npx etudes-dashboard` at sprint transitions (retro, between sprints) — never mid-sprint
