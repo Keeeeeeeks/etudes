@@ -1,326 +1,791 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Etudes Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/basecoat.cdn.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/js/all.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/motion@12.38.0/dist/motion.js" defer></script>
   <style>
-    /* ── Dark theme: shadcn-compatible CSS variable overrides ── */
     :root {
-      color-scheme: dark;
-      --background: 222.2 84% 4.9%;
-      --foreground: 210 40% 98%;
-      --card: 222.2 47% 8%;
-      --card-foreground: 210 40% 98%;
-      --popover: 222.2 47% 8%;
-      --popover-foreground: 210 40% 98%;
-      --primary: 217.2 91.2% 59.8%;
-      --primary-foreground: 222.2 47.4% 97.2%;
-      --secondary: 217.2 32.6% 14%;
-      --secondary-foreground: 210 40% 98%;
-      --muted: 217.2 32.6% 14%;
-      --muted-foreground: 215 20.2% 55%;
-      --accent: 217.2 32.6% 14%;
-      --accent-foreground: 210 40% 98%;
-      --destructive: 0 62.8% 30.6%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 217.2 20% 18%;
-      --input: 217.2 20% 18%;
-      --ring: 224.3 76.3% 48%;
-      --radius: 0.5rem;
+      --bg: #f4efe2;
+      --bg-soft: #ece3d1;
+      --surface: #fffaf0;
+      --surface-strong: #f7ecd7;
+      --text: #2f2416;
+      --muted: #6e5f4a;
+      --line: #d3c1a4;
+      --line-strong: #b49c79;
+      --accent: #7c4a1d;
+      --accent-soft: #d9b88d;
+      --ok: #3d7b54;
+      --warn: #8d5f1f;
+      --danger: #9a3b2c;
+      --radius: 14px;
+      --shadow: 0 10px 26px rgba(49, 34, 18, 0.12);
+    }
+
+    html[data-theme="dark"] {
+      --bg: #14110f;
+      --bg-soft: #1d1917;
+      --surface: #211c19;
+      --surface-strong: #2a231f;
+      --text: #f2e8d6;
+      --muted: #c0b29b;
+      --line: #4a4035;
+      --line-strong: #6a5b4b;
+      --accent: #d9a56a;
+      --accent-soft: #6e563c;
+      --ok: #7fbe8f;
+      --warn: #d8ac6a;
+      --danger: #df8a7e;
+      --shadow: 0 16px 34px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      background: hsl(222.2 84% 4.9%);
       min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(1400px 760px at 8% -10%, rgba(255, 255, 255, 0.45), transparent 56%),
+        radial-gradient(1200px 700px at 100% 0%, rgba(169, 117, 56, 0.16), transparent 50%),
+        var(--bg);
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", serif;
     }
 
-    /* ── Layout ── */
-    .wrap { max-width: 1440px; margin: 0 auto; padding: 24px 20px; }
+    .shell {
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 22px 18px 28px;
+    }
+
+    .ledger-panel {
+      background: linear-gradient(180deg, var(--surface), var(--surface-strong));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
 
     .topbar {
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      padding: 16px 20px !important;
-      margin-bottom: 20px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
-    .topbar header, .topbar section, .topbar footer { display: none; }
-    .topbar-left { text-align: left; }
-    .topbar-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: hsl(var(--foreground)); }
-    .topbar-sub { font-size: 13px; color: hsl(var(--muted-foreground)); margin-top: 2px; }
-    .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
 
-    /* ── Tabs ── */
-    .nav-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; margin-bottom: 20px; }
-    .nav-tab { text-decoration: none; white-space: nowrap; flex-shrink: 0; font-size: 13px; }
-    .nav-tab.active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+    .title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+      color: var(--text);
+    }
 
-    /* ── Summary cards ── */
-    .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .summary-link { text-decoration: none; color: inherit; }
-    .summary-link .card { transition: border-color 150ms ease; }
-    .summary-link:hover .card { border-color: hsl(var(--primary) / 0.4); }
-    .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .summary-row strong { font-size: 14px; }
-    .summary-meta { font-size: 12px; color: hsl(var(--muted-foreground)); margin-bottom: 8px; }
-    .progress-track { height: 6px; background: hsl(var(--muted)); border-radius: 999px; overflow: hidden; margin-top: 8px; }
-    .progress-fill { height: 100%; border-radius: 999px; background: hsl(var(--primary)); transition: width 300ms ease; }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 2px;
+    }
 
-    /* ── Board ── */
-    .board { display: grid; grid-template-columns: repeat(5, minmax(220px, 1fr)); gap: 12px; align-items: start; overflow-x: auto; }
-    .col { min-height: 240px; display: flex; flex-direction: column; }
-    .col.drag-over { border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary) / 0.25) inset; }
-    .col-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground)); letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 1px solid hsl(var(--border)); }
-    .col-body { padding: 8px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
 
-    /* ── Task cards ── */
+    .btn {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .btn:hover {
+      border-color: var(--line-strong);
+      background: var(--bg-soft);
+    }
+
+    .btn-primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff7ea;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.04);
+    }
+
+    .btn-danger {
+      border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+      color: var(--danger);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 14px;
+      padding-bottom: 2px;
+    }
+
+    .tab-link {
+      text-decoration: none;
+      white-space: nowrap;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      line-height: 1.1;
+    }
+
+    .tab-link.active {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 20%, var(--surface));
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .state-banner {
+      margin-bottom: 14px;
+      border-radius: 12px;
+      border: 1px dashed var(--line-strong);
+      background: color-mix(in srgb, var(--bg-soft) 72%, var(--surface));
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      display: none;
+    }
+
+    .state-banner.show {
+      display: block;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .summary-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--surface) 92%, var(--bg-soft));
+      transition: border-color 140ms ease;
+    }
+
+    .summary-link:hover .summary-card {
+      border-color: var(--line-strong);
+    }
+
+    .summary-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 0.93rem;
+    }
+
+    .summary-head strong {
+      color: var(--text);
+    }
+
+    .summary-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      min-height: 1.1em;
+    }
+
+    .progress-track {
+      margin-top: 8px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 90%, #fff), color-mix(in srgb, var(--ok) 70%, var(--accent)));
+      transition: width 220ms ease;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(220px, 1fr));
+      gap: 10px;
+      align-items: start;
+      overflow-x: auto;
+      margin-bottom: 14px;
+    }
+
+    .col {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--surface) 94%, var(--bg-soft));
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .col.drag-over {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent) inset;
+    }
+
+    .col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 10px 9px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .col-body {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
     .task-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 10px;
       cursor: grab;
-      padding: 12px !important;
-      transition: border-color 150ms ease, opacity 150ms ease, transform 150ms ease;
+      transition: border-color 120ms ease, transform 120ms ease, opacity 120ms ease;
     }
-    @media (hover: hover) { .task-card:hover { border-color: hsl(var(--muted-foreground) / 0.25); } }
-    .task-card.dragging { opacity: 0.4; transform: scale(0.98); }
-    .task-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
-    .task-name { font-weight: 600; font-size: 13px; line-height: 1.35; color: hsl(var(--foreground)); }
-    .task-meta { font-size: 12px; color: hsl(var(--muted-foreground)); line-height: 1.4; margin-bottom: 6px; }
-    .task-done { font-size: 12px; color: hsl(var(--muted-foreground)); margin-bottom: 6px; }
-    .task-actions { display: flex; gap: 4px; flex-wrap: wrap; }
-    .task-actions .btn { font-size: 11px; padding: 3px 8px; height: auto; min-height: 0; }
-    .task-actions .select { font-size: 11px; padding: 3px 8px; height: auto; min-height: 0; min-width: 100px; }
-    .btn-danger { color: hsl(0 80% 68%); border-color: hsl(0 30% 22%); }
-    .btn-danger:hover { background: hsl(0 30% 14%); border-color: hsl(0 40% 30%); }
-    .task-comments { border-top: 1px solid hsl(var(--border)); padding-top: 6px; margin-top: 6px; font-size: 12px; color: hsl(var(--muted-foreground)); display: flex; flex-direction: column; gap: 3px; }
 
-    /* ── Status pills ── */
+    .task-card:hover {
+      border-color: var(--line-strong);
+    }
+
+    .task-card.dragging {
+      opacity: 0.45;
+      transform: scale(0.99);
+    }
+
+    .task-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .task-name {
+      font-size: 0.88rem;
+      line-height: 1.34;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .task-meta {
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.35;
+      min-height: 1.06em;
+      margin-bottom: 5px;
+    }
+
+    .task-done {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+
+    .task-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .task-actions .btn,
+    .task-actions .select {
+      font-size: 0.72rem;
+      line-height: 1.2;
+      min-height: 26px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: color-mix(in srgb, var(--surface) 92%, var(--bg-soft));
+    }
+
+    .task-actions .select {
+      min-width: 102px;
+    }
+
+    .task-comments {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed var(--line);
+      font-size: 0.76rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
     .pill {
-      display: inline-flex; align-items: center; font-size: 11px; font-weight: 500;
-      padding: 1px 8px; border-radius: 999px; border: 1px solid transparent;
-      font-variant-numeric: tabular-nums; line-height: 1.6;
-    }
-    .pill-backlog   { background: hsl(215 20% 16%); border-color: hsl(215 15% 26%); color: hsl(215 15% 58%); }
-    .pill-todo      { background: hsl(215 18% 18%); border-color: hsl(215 12% 30%); color: hsl(215 12% 62%); }
-    .pill-progress  { background: hsl(38 70% 10%);  border-color: hsl(38 60% 24%);  color: hsl(38 85% 62%);  }
-    .pill-done      { background: hsl(142 40% 9%);  border-color: hsl(142 35% 22%); color: hsl(142 55% 50%); }
-    .pill-shipped   { background: hsl(188 50% 9%);  border-color: hsl(188 40% 22%); color: hsl(188 60% 50%); }
-
-    /* ── Park / Icebox ── */
-    .park-section { margin-top: 20px; }
-    .park-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; font-size: 14px; font-weight: 600; }
-    .park-count { font-size: 12px; color: hsl(var(--muted-foreground)); font-weight: 400; }
-    .park-list { margin: 0; padding: 4px 14px 14px 32px; font-size: 13px; color: hsl(var(--muted-foreground)); }
-    .park-list li + li { margin-top: 4px; }
-    .park-list:empty::after { content: "No parked ideas yet."; font-style: italic; color: hsl(var(--muted-foreground) / 0.5); }
-
-    .error-msg { color: hsl(0 80% 68%); font-size: 13px; margin-top: 12px; }
-    .error-msg:empty { display: none; }
-
-    /* ── Responsive ── */
-    @media (max-width: 1300px) { .board { grid-template-columns: repeat(3, minmax(220px, 1fr)); } }
-    @media (max-width: 900px) { .board { grid-template-columns: repeat(2, minmax(220px, 1fr)); } }
-    @media (max-width: 600px) {
-      .board { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 1px 8px;
+      font-size: 0.7rem;
+      line-height: 1.45;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
-    /* ── a11y: reduced motion ── */
+    .pill-backlog {
+      background: color-mix(in srgb, var(--bg-soft) 80%, var(--surface));
+      color: var(--muted);
+    }
+
+    .pill-todo {
+      background: color-mix(in srgb, var(--accent-soft) 38%, var(--surface));
+      color: var(--text);
+    }
+
+    .pill-progress {
+      background: color-mix(in srgb, var(--warn) 24%, var(--surface));
+      color: var(--warn);
+      border-color: color-mix(in srgb, var(--warn) 45%, var(--line));
+    }
+
+    .pill-done {
+      background: color-mix(in srgb, var(--ok) 18%, var(--surface));
+      color: var(--ok);
+      border-color: color-mix(in srgb, var(--ok) 36%, var(--line));
+    }
+
+    .pill-shipped {
+      background: color-mix(in srgb, var(--accent) 20%, var(--surface));
+      color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+    }
+
+    .park-panel {
+      border-top: 1px solid var(--line);
+      padding: 12px;
+      margin-top: 2px;
+    }
+
+    .park-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .park-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .park-count {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .park-list {
+      margin: 0;
+      padding: 0 0 0 18px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .park-list li + li {
+      margin-top: 4px;
+    }
+
+    .park-empty {
+      font-style: italic;
+      color: color-mix(in srgb, var(--muted) 70%, transparent);
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.86rem;
+      margin: 12px 1px 0;
+      min-height: 1.15em;
+    }
+
+    @media (max-width: 1280px) {
+      .board {
+        grid-template-columns: repeat(3, minmax(220px, 1fr));
+      }
+    }
+
+    @media (max-width: 920px) {
+      .board {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .board {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- Topbar -->
-    <div class="topbar card">
-      <div class="topbar-left">
-        <div class="topbar-title">Etudes Dashboard</div>
-        <div class="topbar-sub" id="subtitle">Cross-project sprint tracking</div>
+  <div class="shell">
+    <div class="ledger-panel topbar">
+      <div>
+        <div class="title">Etudes Paper Ledger</div>
+        <div class="subtitle" id="subtitle">Cross-project sprint tracking</div>
       </div>
-      <div class="topbar-actions">
-        <button class="btn btn-sm" id="refreshBtn">Refresh</button>
-        <button class="btn btn-sm" id="addTaskBtn">Add Task</button>
-        <button class="btn btn-sm" id="parkBtn">Park Idea</button>
+      <div class="actions">
+        <button class="btn btn-sm" id="themeBtn" type="button">Switch to Dark</button>
+        <button class="btn btn-sm" id="refreshBtn" type="button">Refresh</button>
+        <button class="btn btn-sm btn-primary" id="addTaskBtn" type="button">Add Task</button>
+        <button class="btn btn-sm" id="parkBtn" type="button">Park Idea</button>
       </div>
     </div>
 
-    <!-- Navigation tabs -->
-    <nav class="nav-tabs" id="tabs"></nav>
+    <nav class="tabs" id="tabs" aria-label="Projects"></nav>
 
-    <!-- Summary cards -->
+    <div class="state-banner" id="stateBanner"></div>
+
     <div class="summary-grid" id="summary"></div>
 
-    <!-- Kanban board -->
-    <div class="board" id="board"></div>
+    <section class="board" id="board"></section>
 
-    <!-- Park / Icebox -->
-    <div class="park-section card" id="parkPanel">
+    <section class="ledger-panel park-panel" id="parkPanel">
       <div class="park-head">
-        <span>Park / Icebox</span>
-        <span class="park-count" id="parkCount"></span>
+        <div class="park-title">Park / Icebox</div>
+        <div class="park-count" id="parkCount"></div>
       </div>
       <ul class="park-list" id="parkList"></ul>
-    </div>
+    </section>
 
     <p class="error-msg" id="error"></p>
   </div>
 
   <script>
-    /* ── Constants ── */
     const STATUS_ORDER = ["backlog", "todo", "in_progress", "done", "shipped"];
-    const STATUS_LABEL = { backlog: "Backlog", todo: "To Do", in_progress: "In Progress", done: "Done", shipped: "Shipped" };
-    const PILL_CLASS   = { backlog: "pill-backlog", todo: "pill-todo", in_progress: "pill-progress", done: "pill-done", shipped: "pill-shipped" };
+    const STATUS_LABEL = {
+      backlog: "Backlog",
+      todo: "To Do",
+      in_progress: "In Progress",
+      done: "Done",
+      shipped: "Shipped",
+    };
+    const PILL_CLASS = {
+      backlog: "pill-backlog",
+      todo: "pill-todo",
+      in_progress: "pill-progress",
+      done: "pill-done",
+      shipped: "pill-shipped",
+    };
+    const THEME_KEY = "etudes_dashboard_theme";
 
     let projects = [];
     let route = "";
     let dataset = { columns: {}, parking: [] };
+    let currentSummary = null;
 
     const $ = (id) => document.getElementById(id);
     const subtitleEl = $("subtitle");
-    const tabsEl     = $("tabs");
-    const boardEl    = $("board");
-    const summaryEl  = $("summary");
+    const tabsEl = $("tabs");
+    const boardEl = $("board");
+    const summaryEl = $("summary");
     const parkListEl = $("parkList");
-    const parkCountEl= $("parkCount");
-    const errorEl    = $("error");
+    const parkCountEl = $("parkCount");
+    const stateBannerEl = $("stateBanner");
+    const errorEl = $("error");
 
-    /* ── API helper ── */
     async function api(url, opts = {}) {
-      const res = await fetch(url, { headers: { "Content-Type": "application/json" }, ...opts });
-      if (!res.ok) { const b = await res.json().catch(() => ({})); throw new Error(b.error || `Request failed (${res.status})`); }
+      const res = await fetch(url, {
+        headers: { "Content-Type": "application/json" },
+        ...opts,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Request failed (${res.status})`);
+      }
       return res.json();
     }
 
-    function setError(msg) { errorEl.textContent = msg || ""; }
-    function projectUrl(slug) { return slug === "all" ? "/all" : `/${slug}`; }
-    function parseRoute() { return window.location.pathname.replace(/^\//, "") || ""; }
-
-    function esc(text) {
-      return String(text).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
+    function setError(msg) {
+      errorEl.textContent = msg || "";
     }
 
-    /* ── Render: Tabs ── */
+    function esc(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function projectUrl(slug) {
+      return slug === "all" ? "/all" : `/${slug}`;
+    }
+
+    function parseRoute() {
+      return window.location.pathname.replace(/^\//, "") || "";
+    }
+
+    function findProjectBySlug(slug) {
+      return projects.find((p) => p.slug === slug);
+    }
+
+    function themeLabel(theme) {
+      return theme === "dark" ? "Switch to Light" : "Switch to Dark";
+    }
+
+    function applyTheme(theme) {
+      const safeTheme = theme === "dark" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", safeTheme);
+      $("themeBtn").textContent = themeLabel(safeTheme);
+      localStorage.setItem(THEME_KEY, safeTheme);
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY);
+      applyTheme(saved === "dark" ? "dark" : "light");
+    }
+
     function renderTabs() {
-      const parts = [`<a class="btn btn-sm nav-tab ${route === "all" ? "active" : ""}" href="/all">All</a>`];
+      const parts = [`<a class="tab-link ${route === "all" ? "active" : ""}" href="/all">All</a>`];
       for (const p of projects) {
-        parts.push(`<a class="btn btn-sm nav-tab ${route === p.slug ? "active" : ""}" href="/${p.slug}">${esc(p.name)}</a>`);
+        parts.push(`<a class="tab-link ${route === p.slug ? "active" : ""}" href="/${p.slug}">${esc(p.name)}</a>`);
       }
       tabsEl.innerHTML = parts.join("");
     }
 
-    /* ── Render: Summary ── */
     function renderSummary() {
       const out = [];
       for (const p of projects) {
         const s = p.summary;
         if (!s) {
-          out.push(`<div class="card"><section><div class="summary-row"><strong>${esc(p.name)}</strong><span class="pill pill-backlog">No sprint</span></div><div class="summary-meta">${p.missing ? "Path missing" : "Run /etudes to start"}</div></section></div>`);
+          out.push(
+            `<div class="summary-card"><div class="summary-head"><strong>${esc(p.name)}</strong><span class="pill pill-backlog">No sprint</span></div><div class="summary-meta">${p.missing ? "Path missing" : "Run /etudes to start"}</div></div>`
+          );
           continue;
         }
         const pct = s.totalCount ? Math.round((s.doneCount / s.totalCount) * 100) : 0;
-        out.push(`
-          <a class="summary-link" href="/${p.slug}"><div class="card"><section>
-            <div class="summary-row"><strong>${esc(p.name)}</strong><span class="pill pill-done">${s.doneCount}/${s.totalCount}</span></div>
-            <div class="summary-meta">Next: ${s.nextTask ? esc(s.nextTask.title) : "No pending task"}</div>
-            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-          </section></div></a>`);
+        out.push(
+          `<a class="summary-link" href="/${p.slug}"><div class="summary-card"><div class="summary-head"><strong>${esc(p.name)}</strong><span class="pill pill-done">${s.doneCount}/${s.totalCount}</span></div><div class="summary-meta">Next: ${s.nextTask ? esc(s.nextTask.title) : "No pending task"}</div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div></div></a>`
+        );
       }
       summaryEl.innerHTML = out.join("");
     }
 
-    /* ── Render: Task card ── */
-    function cardHtml(task) {
-      const comments = (task.comments || []).map(c => `<div>• ${esc(c)}</div>`).join("");
-      const commentBlock = comments ? `<div class="task-comments">${comments}</div>` : "";
-      const projBadge = task.projectName ? `<span class="pill pill-backlog">${esc(task.projectName)}</span>` : "";
+    function classifyRouteState() {
+      const counts = {
+        backlog: (dataset.columns.backlog || []).length,
+        todo: (dataset.columns.todo || []).length,
+        in_progress: (dataset.columns.in_progress || []).length,
+        done: (dataset.columns.done || []).length,
+        shipped: (dataset.columns.shipped || []).length,
+      };
+      const total = counts.backlog + counts.todo + counts.in_progress + counts.done + counts.shipped;
+      const active = counts.todo + counts.in_progress;
 
-      return `
-        <div class="task-card card" draggable="true" data-id="${task.id}" data-project="${task.projectSlug}" data-status="${task.status}">
-          <section>
-            <div class="task-row">
-              <span class="task-name">${esc(task.title)}</span>
-              ${projBadge}
-            </div>
-            <div class="task-meta">
-              ${task.estimate ? `⏱ ${esc(task.estimate)}` : ""}${task.fileRef ? ` · ${esc(task.fileRef)}` : ""}${task.day ? ` · Day ${task.day}` : ""}
-            </div>
-            ${task.doneDefinition ? `<div class="task-done">Done = ${esc(task.doneDefinition)}</div>` : ""}
-            <div class="task-actions">
-              <select class="select" data-action="status">
-                ${STATUS_ORDER.map(s => `<option value="${s}" ${s === task.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}
-              </select>
-              <button class="btn" data-action="edit">Edit</button>
-              <button class="btn" data-action="comment">Comment</button>
-              <button class="btn btn-danger" data-action="delete">Delete</button>
-            </div>
-            ${commentBlock}
-          </section>
-        </div>`;
+      if (route === "all") {
+        const activeProjects = projects.filter((p) => p.summary);
+        if (!activeProjects.length) {
+          return "empty";
+        }
+        const allDone = activeProjects.every((p) => p.summary.totalCount > 0 && p.summary.doneCount === p.summary.totalCount);
+        if (allDone) {
+          return "all_done";
+        }
+        if (total === 0) {
+          return "empty";
+        }
+        return "normal";
+      }
+
+      if (total === 0) {
+        return "empty";
+      }
+      if (active === 0 && counts.backlog > 0) {
+        return "day_complete";
+      }
+      if (active === 0 && counts.backlog === 0 && (counts.done + counts.shipped) > 0) {
+        return "all_done";
+      }
+      return "normal";
     }
 
-    /* ── Render: Board ── */
+    function renderStateBanner() {
+      const state = classifyRouteState();
+      if (state === "normal") {
+        stateBannerEl.classList.remove("show");
+        stateBannerEl.textContent = "";
+        return;
+      }
+
+      let text = "";
+      if (state === "empty") {
+        text = route === "all"
+          ? "No active Etudes projects found. Run /etudes in a project to populate this board."
+          : "No sprint tasks yet for this project. Run /etudes or add your first task here.";
+      } else if (state === "day_complete") {
+        text = "Today looks complete: no active To Do or In Progress tasks. Park new ideas or promote backlog work tomorrow.";
+      } else if (state === "all_done") {
+        text = route === "all"
+          ? "All tracked projects are complete. Take a breather, then start the next sprint when ready."
+          : "This project sprint is fully complete. Rest briefly, then kick off the next calibration loop.";
+      }
+
+      stateBannerEl.textContent = text;
+      stateBannerEl.classList.add("show");
+    }
+
+    function cardHtml(task) {
+      const comments = (task.comments || []).map((c) => `<div>• ${esc(c)}</div>`).join("");
+      const commentBlock = comments ? `<div class="task-comments">${comments}</div>` : "";
+      const projBadge = task.projectName ? `<span class="pill pill-backlog">${esc(task.projectName)}</span>` : "";
+      const metaBits = [];
+      if (task.estimate) {
+        metaBits.push(`Est ${esc(task.estimate)}`);
+      }
+      if (task.fileRef) {
+        metaBits.push(esc(task.fileRef));
+      }
+      if (task.day) {
+        metaBits.push(`Day ${task.day}`);
+      }
+
+      return `
+        <article class="task-card" draggable="true" data-id="${task.id}" data-project="${task.projectSlug}" data-status="${task.status}">
+          <div class="task-row">
+            <div class="task-name">${esc(task.title)}</div>
+            ${projBadge}
+          </div>
+          <div class="task-meta">${metaBits.join(" · ")}</div>
+          ${task.doneDefinition ? `<div class="task-done">Done = ${esc(task.doneDefinition)}</div>` : ""}
+          <div class="task-actions">
+            <select class="select" data-action="status">
+              ${STATUS_ORDER.map((s) => `<option value="${s}" ${s === task.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}
+            </select>
+            <button class="btn" data-action="edit" type="button">Edit</button>
+            <button class="btn" data-action="comment" type="button">Comment</button>
+            <button class="btn btn-danger" data-action="delete" type="button">Delete</button>
+          </div>
+          ${commentBlock}
+        </article>`;
+    }
+
     function renderBoard() {
-      boardEl.innerHTML = STATUS_ORDER.map(status => {
+      boardEl.innerHTML = STATUS_ORDER.map((status) => {
         const list = dataset.columns[status] || [];
         return `
-          <div class="col card" data-drop-status="${status}">
-            <div class="col-head">
+          <section class="col" data-drop-status="${status}">
+            <header class="col-head">
               <span>${STATUS_LABEL[status]}</span>
               <span class="pill ${PILL_CLASS[status]}">${list.length}</span>
-            </div>
+            </header>
             <div class="col-body" data-drop-status="${status}">
               ${list.map(cardHtml).join("")}
             </div>
-          </div>`;
+          </section>`;
       }).join("");
 
       bindCardActions();
       bindDnD();
-      animateCards();
     }
 
-    function animateCards() {
-      if (!window.Motion?.animate) return;
-      const cards = boardEl.querySelectorAll(".task-card");
-      if (!cards.length) return;
-      window.Motion.animate(cards, { opacity: [0, 1], y: [8, 0] }, { duration: 0.18, delay: window.Motion.stagger(0.015), easing: "ease-out" });
-    }
-
-    /* ── Render: Parking ── */
     function renderParking() {
       parkCountEl.textContent = `${dataset.parking.length} ideas`;
-      parkListEl.innerHTML = dataset.parking.map(i => `<li>${esc(i)}</li>`).join("");
+      if (!dataset.parking.length) {
+        parkListEl.innerHTML = '<li class="park-empty">No parked ideas yet.</li>';
+        return;
+      }
+      parkListEl.innerHTML = dataset.parking.map((item) => `<li>${esc(item)}</li>`).join("");
     }
 
-    /* ── Data loaders ── */
-    function findProjectBySlug(slug) { return projects.find(p => p.slug === slug); }
-
-    async function loadProjects() { projects = (await api("/api/projects")).projects || []; }
+    async function loadProjects() {
+      projects = (await api("/api/projects")).projects || [];
+    }
 
     async function loadSingleProject(slug) {
       const data = await api(`/api/projects/${slug}`);
       subtitleEl.textContent = `${data.project.name} · ${data.summary.doneCount}/${data.summary.totalCount} tasks`;
+      currentSummary = data.summary;
       dataset = { columns: data.columns, parking: data.parking };
       for (const s of STATUS_ORDER) {
-        dataset.columns[s] = (dataset.columns[s] || []).map(t => ({ ...t, projectSlug: slug, projectName: data.project.name, status: s }));
+        dataset.columns[s] = (dataset.columns[s] || []).map((t) => ({
+          ...t,
+          projectSlug: slug,
+          projectName: data.project.name,
+          status: s,
+        }));
       }
     }
 
     async function loadAllProjectsBoard() {
       subtitleEl.textContent = "All projects · unified board";
+      currentSummary = null;
       const columns = { backlog: [], todo: [], in_progress: [], done: [], shipped: [] };
       const parking = [];
       for (const p of projects) {
-        if (!p.summary) continue;
+        if (!p.summary) {
+          continue;
+        }
         const data = await api(`/api/projects/${p.slug}`);
-        for (const s of STATUS_ORDER) { for (const t of data.columns[s] || []) columns[s].push({ ...t, status: s, projectSlug: p.slug, projectName: p.name }); }
-        for (const i of data.parking || []) parking.push(`${i} [${p.name}]`);
+        for (const s of STATUS_ORDER) {
+          for (const t of data.columns[s] || []) {
+            columns[s].push({ ...t, status: s, projectSlug: p.slug, projectName: p.name });
+          }
+        }
+        for (const idea of data.parking || []) {
+          parking.push(`${idea} [${p.name}]`);
+        }
       }
       dataset = { columns, parking };
     }
@@ -329,102 +794,263 @@
       setError("");
       route = parseRoute();
       await loadProjects();
+
       if (!route) {
-        const first = projects.find(p => p.summary) || projects[0];
-        if (first) { window.location.replace(projectUrl(first.slug)); return; }
+        const first = projects.find((p) => p.summary) || projects[0];
+        if (first) {
+          window.location.replace(projectUrl(first.slug));
+          return;
+        }
         route = "all";
       }
-      if (route !== "all" && !findProjectBySlug(route)) { setError(`Unknown project: ${route}`); route = "all"; }
+
+      if (route !== "all" && !findProjectBySlug(route)) {
+        setError(`Unknown project: ${route}`);
+        route = "all";
+      }
+
       renderTabs();
       renderSummary();
-      route === "all" ? await loadAllProjectsBoard() : await loadSingleProject(route);
+
+      if (route === "all") {
+        await loadAllProjectsBoard();
+      } else {
+        await loadSingleProject(route);
+      }
+
+      renderStateBanner();
       renderBoard();
       renderParking();
     }
 
-    /* ── Mutations ── */
-    async function mutateStatus(slug, id, status) { await api(`/api/projects/${slug}/tasks/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }); }
+    async function mutateStatus(slug, id, status) {
+      await api(`/api/projects/${slug}/tasks/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+    }
 
     async function mutateEdit(slug, id) {
-      const title = prompt("Task title"); if (title === null || !title.trim()) return;
+      const title = prompt("Task title");
+      if (title === null || !title.trim()) {
+        return;
+      }
       const estimate = prompt("Estimate (e.g. 15min)", "") || null;
       const fileRef = prompt("File ref", "") || null;
       const doneDefinition = prompt("Done definition", "") || null;
-      await api(`/api/projects/${slug}/tasks/${id}`, { method: "PATCH", body: JSON.stringify({ title: title.trim(), estimate, fileRef, doneDefinition }) });
+      await api(`/api/projects/${slug}/tasks/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          title: title.trim(),
+          estimate,
+          fileRef,
+          doneDefinition,
+        }),
+      });
     }
 
     async function mutateComment(slug, id) {
-      const text = prompt("Comment"); if (!text?.trim()) return;
-      await api(`/api/projects/${slug}/tasks/${id}/comments`, { method: "POST", body: JSON.stringify({ text: text.trim() }) });
+      const text = prompt("Comment");
+      if (!text || !text.trim()) {
+        return;
+      }
+      await api(`/api/projects/${slug}/tasks/${id}/comments`, {
+        method: "POST",
+        body: JSON.stringify({ text: text.trim() }),
+      });
     }
 
     async function mutateDelete(slug, id) {
-      if (!confirm("Delete this task? Etudes check-ins will ask why.")) return;
+      if (!confirm("Delete this task? Etudes check-ins will ask why.")) {
+        return;
+      }
       await api(`/api/projects/${slug}/tasks/${id}`, { method: "DELETE" });
     }
 
-    /* ── Card action bindings ── */
     function bindCardActions() {
-      boardEl.querySelectorAll(".task-card").forEach(card => {
-        const slug = card.dataset.project, id = card.dataset.id;
-        card.querySelector('[data-action="status"]').addEventListener("change", async e => { try { await mutateStatus(slug, id, e.target.value); await loadRoute(); } catch(e) { setError(e.message); } });
-        card.querySelector('[data-action="edit"]').addEventListener("click", async () => { try { await mutateEdit(slug, id); await loadRoute(); } catch(e) { setError(e.message); } });
-        card.querySelector('[data-action="comment"]').addEventListener("click", async () => { try { await mutateComment(slug, id); await loadRoute(); } catch(e) { setError(e.message); } });
-        card.querySelector('[data-action="delete"]').addEventListener("click", async () => { try { await mutateDelete(slug, id); await loadRoute(); } catch(e) { setError(e.message); } });
-      });
-    }
+      boardEl.querySelectorAll(".task-card").forEach((card) => {
+        const slug = card.dataset.project;
+        const id = card.dataset.id;
 
-    /* ── Drag and drop ── */
-    function bindDnD() {
-      let dragged = null;
-      boardEl.querySelectorAll(".task-card").forEach(card => {
-        card.addEventListener("dragstart", e => { dragged = { id: card.dataset.id, projectSlug: card.dataset.project }; card.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; });
-        card.addEventListener("dragend", () => card.classList.remove("dragging"));
-      });
-      boardEl.querySelectorAll("[data-drop-status]").forEach(zone => {
-        zone.addEventListener("dragover", e => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; zone.closest(".col")?.classList.add("drag-over"); });
-        zone.addEventListener("dragleave", e => { if (!zone.contains(e.relatedTarget)) zone.closest(".col")?.classList.remove("drag-over"); });
-        zone.addEventListener("drop", async e => {
-          e.preventDefault(); zone.closest(".col")?.classList.remove("drag-over");
-          if (!dragged) return;
-          try { await mutateStatus(dragged.projectSlug, dragged.id, zone.dataset.dropStatus); await loadRoute(); } catch(e) { setError(e.message); }
+        card.querySelector('[data-action="status"]').addEventListener("change", async (event) => {
+          try {
+            await mutateStatus(slug, id, event.target.value);
+            await loadRoute();
+          } catch (err) {
+            setError(err.message);
+          }
+        });
+
+        card.querySelector('[data-action="edit"]').addEventListener("click", async () => {
+          try {
+            await mutateEdit(slug, id);
+            await loadRoute();
+          } catch (err) {
+            setError(err.message);
+          }
+        });
+
+        card.querySelector('[data-action="comment"]').addEventListener("click", async () => {
+          try {
+            await mutateComment(slug, id);
+            await loadRoute();
+          } catch (err) {
+            setError(err.message);
+          }
+        });
+
+        card.querySelector('[data-action="delete"]').addEventListener("click", async () => {
+          try {
+            await mutateDelete(slug, id);
+            await loadRoute();
+          } catch (err) {
+            setError(err.message);
+          }
         });
       });
     }
 
-    /* ── Add task / Park idea ── */
+    function bindDnD() {
+      let dragged = null;
+      boardEl.querySelectorAll(".task-card").forEach((card) => {
+        card.addEventListener("dragstart", (event) => {
+          dragged = { id: card.dataset.id, projectSlug: card.dataset.project };
+          card.classList.add("dragging");
+          event.dataTransfer.effectAllowed = "move";
+        });
+        card.addEventListener("dragend", () => {
+          card.classList.remove("dragging");
+        });
+      });
+
+      boardEl.querySelectorAll("[data-drop-status]").forEach((zone) => {
+        zone.addEventListener("dragover", (event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "move";
+          zone.closest(".col")?.classList.add("drag-over");
+        });
+
+        zone.addEventListener("dragleave", (event) => {
+          if (!zone.contains(event.relatedTarget)) {
+            zone.closest(".col")?.classList.remove("drag-over");
+          }
+        });
+
+        zone.addEventListener("drop", async (event) => {
+          event.preventDefault();
+          zone.closest(".col")?.classList.remove("drag-over");
+          if (!dragged) {
+            return;
+          }
+          try {
+            await mutateStatus(dragged.projectSlug, dragged.id, zone.dataset.dropStatus);
+            await loadRoute();
+          } catch (err) {
+            setError(err.message);
+          }
+        });
+      });
+    }
+
     async function addTask() {
       try {
-        const title = prompt("Task title"); if (!title?.trim()) return;
+        const title = prompt("Task title");
+        if (!title || !title.trim()) {
+          return;
+        }
         const estimate = prompt("Estimate (e.g. 20min)", "") || null;
         const fileRef = prompt("File ref (optional)", "") || null;
         const doneDefinition = prompt("Done definition (optional)", "") || null;
         const status = prompt("Status: backlog|todo|in_progress|done|shipped", "backlog") || "backlog";
+
         let slug = route;
-        if (route === "all") { const opts = projects.filter(p => p.summary).map(p => p.slug).join(", "); slug = prompt(`Project (${opts})`, projects.find(p => p.summary)?.slug || "") || ""; }
-        if (!slug) return;
-        await api(`/api/projects/${slug}/tasks`, { method: "POST", body: JSON.stringify({ title: title.trim(), estimate, fileRef, doneDefinition, status: status.trim() }) });
+        if (route === "all") {
+          const opts = projects.filter((p) => p.summary).map((p) => p.slug).join(", ");
+          slug = prompt(`Project (${opts})`, projects.find((p) => p.summary)?.slug || "") || "";
+        }
+        if (!slug) {
+          return;
+        }
+
+        await api(`/api/projects/${slug}/tasks`, {
+          method: "POST",
+          body: JSON.stringify({
+            title: title.trim(),
+            estimate,
+            fileRef,
+            doneDefinition,
+            status: status.trim(),
+          }),
+        });
+
         await loadRoute();
-      } catch(e) { setError(e.message); }
+      } catch (err) {
+        setError(err.message);
+      }
     }
 
     async function parkIdea() {
       try {
-        const text = prompt("Idea to park"); if (!text?.trim()) return;
+        const text = prompt("Idea to park");
+        if (!text || !text.trim()) {
+          return;
+        }
+
         let slug = route;
-        if (route === "all") { const opts = projects.filter(p => p.summary).map(p => p.slug).join(", "); slug = prompt(`Project (${opts})`, projects.find(p => p.summary)?.slug || "") || ""; }
-        if (!slug) return;
-        await api(`/api/projects/${slug}/park`, { method: "POST", body: JSON.stringify({ text: text.trim(), day: "?" }) });
+        if (route === "all") {
+          const opts = projects.filter((p) => p.summary).map((p) => p.slug).join(", ");
+          slug = prompt(`Project (${opts})`, projects.find((p) => p.summary)?.slug || "") || "";
+        }
+        if (!slug) {
+          return;
+        }
+
+        await api(`/api/projects/${slug}/park`, {
+          method: "POST",
+          body: JSON.stringify({ text: text.trim(), day: "?" }),
+        });
+
         await loadRoute();
-      } catch(e) { setError(e.message); }
+      } catch (err) {
+        setError(err.message);
+      }
     }
 
-    /* ── Init ── */
-    $("refreshBtn").addEventListener("click", () => loadRoute().catch(e => setError(e.message)));
+    function bindNavigation() {
+      tabsEl.addEventListener("click", (event) => {
+        const link = event.target.closest("a[href]");
+        if (!link) {
+          return;
+        }
+        const href = link.getAttribute("href");
+        if (!href || !href.startsWith("/")) {
+          return;
+        }
+        event.preventDefault();
+        if (window.location.pathname === href) {
+          return;
+        }
+        window.history.pushState({}, "", href);
+        loadRoute().catch((err) => setError(err.message));
+      });
+    }
+
+    $("themeBtn").addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+    $("refreshBtn").addEventListener("click", () => {
+      loadRoute().catch((err) => setError(err.message));
+    });
     $("addTaskBtn").addEventListener("click", addTask);
     $("parkBtn").addEventListener("click", parkIdea);
-    window.addEventListener("popstate", () => loadRoute().catch(e => setError(e.message)));
-    loadRoute().catch(e => setError(e.message));
+    window.addEventListener("popstate", () => {
+      loadRoute().catch((err) => setError(err.message));
+    });
+
+    initTheme();
+    bindNavigation();
+    loadRoute().catch((err) => setError(err.message));
   </script>
 </body>
 </html>
