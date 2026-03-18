@@ -1,6 +1,6 @@
 {
   "name": "etudes-dashboard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local cross-project dashboard for Etudes sprint data",
   "bin": {
     "etudes-dashboard": "dashboard/server.js"
